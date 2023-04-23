@@ -1,3 +1,5 @@
 *.js
 *.sh
 .vscode
+.idea
+*.imp
