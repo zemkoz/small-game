@@ -112,17 +112,17 @@ class Down implements Input {
 
 interface Tile {
   isStony(): boolean;
-  isFallingStone(): boolean;
   isBoxy(): boolean;
-  isFallingBox(): boolean;
   isLock1(): boolean;
-
   isLock2(): boolean;
   isAir(): boolean;
+  isFalling(): boolean;
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
   moveHorizontal(dx: number): void;
   moveVertical(dy: number): void;
+  drop(): void;
+  rest(): void;
 }
 
 class Flux implements Tile {
@@ -130,15 +130,7 @@ class Flux implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -151,6 +143,10 @@ class Flux implements Tile {
   }
 
   isAir(): boolean {
+    return false;
+  }
+
+  isFalling(): boolean {
     return false;
   }
 
@@ -166,6 +162,14 @@ class Flux implements Tile {
   moveVertical(dy: number): void {
     moveToTile(playerx, playery + dy);
   }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
+    // Empty
+  }
 }
 
 class Unbreakable implements Tile {
@@ -173,15 +177,7 @@ class Unbreakable implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -194,6 +190,10 @@ class Unbreakable implements Tile {
   }
 
   isAir(): boolean {
+    return false;
+  }
+
+  isFalling(): boolean {
     return false;
   }
 
@@ -209,6 +209,14 @@ class Unbreakable implements Tile {
   moveVertical(dy: number): void {
     // Empty
   }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
+    // Empty
+  }
 }
 
 class Stone implements Tile {
@@ -219,15 +227,7 @@ class Stone implements Tile {
     return true;
   }
 
-  isFallingStone(): boolean {
-    return this.falling.isFalling();
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -241,6 +241,10 @@ class Stone implements Tile {
 
   isAir(): boolean {
     return false;
+  }
+
+  isFalling(): boolean {
+    return this.falling.isFalling();
   }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -255,6 +259,14 @@ class Stone implements Tile {
   moveVertical(dy: number): void {
     // Empty
   }
+
+  drop(): void {
+    this.falling = new Falling();
+  }
+
+  rest(): void {
+    this.falling = new Resting();
+  }
 }
 
 class Box implements Tile {
@@ -265,16 +277,8 @@ class Box implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
     return true;
-  }
-
-  isFallingBox(): boolean {
-    return this.falling.isFalling();
   }
 
   isLock1(): boolean {
@@ -287,6 +291,10 @@ class Box implements Tile {
 
   isAir(): boolean {
     return false;
+  }
+
+  isFalling(): boolean {
+    return this.falling.isFalling();
   }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -301,6 +309,14 @@ class Box implements Tile {
   moveVertical(dy: number): void {
     // Empty
   }
+
+  drop(): void {
+    this.falling = new Falling();
+  }
+
+  rest(): void {
+    this.falling = new Resting();
+  }
 }
 
 class Key1 implements Tile {
@@ -308,15 +324,7 @@ class Key1 implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -329,6 +337,10 @@ class Key1 implements Tile {
   }
 
   isAir(): boolean {
+    return false;
+  }
+
+  isFalling(): boolean {
     return false;
   }
 
@@ -346,6 +358,14 @@ class Key1 implements Tile {
     removeLock1();
     moveToTile(playerx, playery + dy);
   }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
+    // Empty
+  }
 }
 
 class Lock1 implements Tile {
@@ -353,15 +373,7 @@ class Lock1 implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -374,6 +386,10 @@ class Lock1 implements Tile {
   }
 
   isAir(): boolean {
+    return false;
+  }
+
+  isFalling(): boolean {
     return false;
   }
 
@@ -389,6 +405,14 @@ class Lock1 implements Tile {
   moveVertical(dy: number): void {
     // Empty
   }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
+    // Empty
+  }
 }
 
 class Key2 implements Tile {
@@ -396,15 +420,7 @@ class Key2 implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -417,6 +433,10 @@ class Key2 implements Tile {
   }
 
   isAir(): boolean {
+    return false;
+  }
+
+  isFalling(): boolean {
     return false;
   }
 
@@ -434,6 +454,14 @@ class Key2 implements Tile {
     removeLock2();
     moveToTile(playerx, playery + dy);
   }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
+    // Empty
+  }
 }
 
 class Lock2 implements Tile {
@@ -441,15 +469,7 @@ class Lock2 implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -465,6 +485,10 @@ class Lock2 implements Tile {
     return false;
   }
 
+  isFalling(): boolean {
+    return false;
+  }
+
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
     g.fillStyle = "#00ccff";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -475,6 +499,14 @@ class Lock2 implements Tile {
   }
 
   moveVertical(dy: number): void {
+    // Empty
+  }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
     // Empty
   }
 }
@@ -484,15 +516,7 @@ class Air implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -508,6 +532,10 @@ class Air implements Tile {
     return true;
   }
 
+  isFalling(): boolean {
+    return false;
+  }
+
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
     // Empty
   }
@@ -519,6 +547,14 @@ class Air implements Tile {
   moveVertical(dy: number): void {
     moveToTile(playerx, playery + dy);
   }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
+    // Empty
+  }
 }
 
 class Player implements Tile {
@@ -526,16 +562,7 @@ class Player implements Tile {
     return false;
   }
 
-  isFallingStone(): boolean {
-    return false;
-  }
-
-
   isBoxy(): boolean {
-    return false;
-  }
-
-  isFallingBox(): boolean {
     return false;
   }
 
@@ -551,6 +578,10 @@ class Player implements Tile {
     return false;
   }
 
+  isFalling(): boolean {
+    return false;
+  }
+
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
     // Empty
   }
@@ -560,6 +591,14 @@ class Player implements Tile {
   }
 
   moveVertical(dy: number): void {
+    // Empty
+  }
+
+  drop(): void {
+    // Empty
+  }
+
+  rest(): void {
     // Empty
   }
 }
@@ -655,18 +694,12 @@ function updateMap() {
 }
 
 function updateTitle(x: number, y: number) {
-  if (map[y][x].isStony()
-      && map[y + 1][x].isAir()) {
-    map[y + 1][x] = new Stone(new Falling());
+  if ((map[y][x].isStony() || map[y][x].isBoxy()) && map[y + 1][x].isAir()) {
+    map[y][x].drop()
+    map[y + 1][x] = map[y][x];
     map[y][x] = new Air();
-  } else if (map[y][x].isBoxy()
-      && map[y + 1][x].isAir()) {
-    map[y + 1][x] = new Box(new Falling());
-    map[y][x] = new Air();
-  } else if (map[y][x].isFallingStone()) {
-    map[y][x] = new Stone(new Resting());
-  } else if (map[y][x].isFallingBox()) {
-    map[y][x] = new Box(new Resting());
+  } else if (map[y][x].isFalling()) {
+    map[y][x].rest();
   }
 }
 
