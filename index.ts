@@ -260,7 +260,11 @@ class Box implements Tile {
   }
 }
 
-class Key1 implements Tile {
+class Key implements Tile {
+  constructor(private readonly color: string,
+              private readonly removeStrategy: RemoveStrategy) {
+  }
+
   isLock1(): boolean {
     return false;
   }
@@ -274,12 +278,12 @@ class Key1 implements Tile {
   }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#ffcc00";
+    g.fillStyle = this.color;
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
   moveHorizontal(dx: number): void {
-    remove(new RemoveLock1())
+    remove(this.removeStrategy);
     moveToTile(playerx + dx, playery);
   }
 
@@ -293,83 +297,24 @@ class Key1 implements Tile {
   }
 }
 
-class Lock1 implements Tile {
+class DoorLock implements Tile {
+  constructor(private readonly color: string,
+              private readonly lock1: boolean) {
+  }
+
   isLock1(): boolean {
-    return true;
+    return this.lock1;
   }
 
   isLock2(): boolean {
-    return false;
+    return !this.lock1;
   }
 
   isAir(): boolean {
     return false;
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#ffcc00";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  moveHorizontal(dx: number): void {
-    // Empty
-  }
-
-  moveVertical(dy: number): void {
-    // Empty
-  }
-
-  update(x: number, y: number): void {
-    // Empty
-  }
-}
-
-class Key2 implements Tile {
-  isLock1(): boolean {
-    return false;
-  }
-
-  isLock2(): boolean {
-    return false;
-  }
-
-  isAir(): boolean {
-    return false;
-  }
-
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#00ccff";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  moveHorizontal(dx: number): void {
-    remove(new RemoveLock2());
-    moveToTile(playerx + dx, playery);
-  }
-
-  moveVertical(dy: number): void {
-    remove(new RemoveLock2());
-    moveToTile(playerx, playery + dy);
-  }
-
-  update(x: number, y: number): void {
-    // Empty
-  }
-}
-
-class Lock2 implements Tile {
-  isLock1(): boolean {
-    return false;
-  }
-
-  isLock2(): boolean {
-    return true;
-  }
-
-  isAir(): boolean {
-    return false;
-  }
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#00ccff";
+    g.fillStyle = this.color;
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
@@ -612,10 +557,10 @@ function transformTile(tile: RawTile) {
     case RawTile.BOX: return new Box(new Resting());
     case RawTile.FALLING_BOX: return new Box(new Falling());
     case RawTile.FLUX: return new Flux();
-    case RawTile.KEY1: return new Key1();
-    case RawTile.LOCK1: return new Lock1();
-    case RawTile.KEY2: return new Key2();
-    case RawTile.LOCK2: return new Lock2();
+    case RawTile.KEY1: return new Key("#ffcc00", new RemoveLock1());
+    case RawTile.LOCK1: return new DoorLock("#ffcc00", true);
+    case RawTile.KEY2: return new Key("#00ccff", new RemoveLock2());
+    case RawTile.LOCK2: return new DoorLock("#00ccff", false);
     default: assertExhausted(tile);
   }
 }
