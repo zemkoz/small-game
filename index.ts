@@ -261,8 +261,7 @@ class Box implements Tile {
 }
 
 class Key implements Tile {
-  constructor(private readonly color: string,
-              private readonly removeStrategy: RemoveStrategy) {
+  constructor(private readonly keyConfig: KeyConfiguration) {
   }
 
   isLock1(): boolean {
@@ -278,12 +277,12 @@ class Key implements Tile {
   }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = this.color;
+    g.fillStyle = this.keyConfig.getColor();
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
   moveHorizontal(dx: number): void {
-    remove(this.removeStrategy);
+    remove(this.keyConfig.getRemoveStrategy());
     moveToTile(playerx + dx, playery);
   }
 
@@ -298,23 +297,22 @@ class Key implements Tile {
 }
 
 class DoorLock implements Tile {
-  constructor(private readonly color: string,
-              private readonly lock1: boolean) {
+  constructor(private readonly keyConfig: KeyConfiguration) {
   }
 
   isLock1(): boolean {
-    return this.lock1;
+    return this.keyConfig.isLock1();
   }
 
   isLock2(): boolean {
-    return !this.lock1;
+    return !this.keyConfig.isLock1();
   }
 
   isAir(): boolean {
     return false;
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = this.color;
+    g.fillStyle = this.keyConfig.getColor();
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
@@ -328,6 +326,25 @@ class DoorLock implements Tile {
 
   update(x: number, y: number): void {
     // Empty
+  }
+}
+
+class KeyConfiguration {
+  constructor(private readonly color: string,
+              private readonly lock1: boolean,
+              private readonly removeStrategy: RemoveStrategy) {
+  }
+
+  getColor(): string {
+    return this.color;
+  }
+
+  isLock1(): boolean {
+    return this.lock1;
+  }
+
+  getRemoveStrategy(): RemoveStrategy {
+    return this.removeStrategy;
   }
 }
 
@@ -547,6 +564,9 @@ function gameLoop() {
   setTimeout(() => gameLoop(), sleep);
 }
 
+const YELLOW_KEY_CONF = new KeyConfiguration("#ffcc00", true, new RemoveLock1());
+const BLUE_KEY_CONF = new KeyConfiguration("#00ccff", false, new RemoveLock2());
+
 function transformTile(tile: RawTile) {
   switch (tile) {
     case RawTile.AIR: return new Air();
@@ -557,10 +577,10 @@ function transformTile(tile: RawTile) {
     case RawTile.BOX: return new Box(new Resting());
     case RawTile.FALLING_BOX: return new Box(new Falling());
     case RawTile.FLUX: return new Flux();
-    case RawTile.KEY1: return new Key("#ffcc00", new RemoveLock1());
-    case RawTile.LOCK1: return new DoorLock("#ffcc00", true);
-    case RawTile.KEY2: return new Key("#00ccff", new RemoveLock2());
-    case RawTile.LOCK2: return new DoorLock("#00ccff", false);
+    case RawTile.KEY1: return new Key(YELLOW_KEY_CONF);
+    case RawTile.LOCK1: return new DoorLock(YELLOW_KEY_CONF);
+    case RawTile.KEY2: return new Key(BLUE_KEY_CONF);
+    case RawTile.LOCK2: return new DoorLock(BLUE_KEY_CONF);
     default: assertExhausted(tile);
   }
 }
