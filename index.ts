@@ -141,11 +141,11 @@ class Flux implements Tile {
   }
 
   moveHorizontal(player: Player, dx: number): void {
-    moveToTile(player.getX() + dx, player.getY());
+    player.moveToTile(player.getX() + dx, player.getY());
   }
 
   moveVertical(player: Player, dy: number): void {
-    moveToTile(player.getX(), player.getY() + dy);
+    player.moveToTile(player.getX(), player.getY() + dy);
   }
 
   update(x: number, y: number): void {
@@ -297,12 +297,12 @@ class Key implements Tile {
 
   moveHorizontal(player: Player, dx: number): void {
     this.keyConfig.removeLock();
-    moveToTile(player.getX() + dx, player.getY());
+    player.moveToTile(player.getX() + dx, player.getY());
   }
 
   moveVertical(player: Player, dy: number): void {
     this.keyConfig.removeLock();
-    moveToTile(player.getX(), player.getY() + dy);
+    player.moveToTile(player.getX(), player.getY() + dy);
   }
 
   update(x: number, y: number): void {
@@ -388,11 +388,11 @@ class Air implements Tile {
   }
 
   moveHorizontal(player: Player, dx: number): void {
-    moveToTile(player.getX() + dx, player.getY());
+    player.move(dx, 0);
   }
 
   moveVertical(player: Player, dy: number): void {
-    moveToTile(player.getX(), player.getY() + dy);
+    player.moveToTile(player.getX(), player.getY() + dy);
   }
 
   update(x: number, y: number): void {
@@ -459,7 +459,7 @@ class Resting implements FallingState {
     if (map[player.getY()][player.getX() + dx + dx].isAir()
         && !map[player.getY() + 1][player.getX() + dx].isAir()) {
       map[player.getY()][player.getX() + dx + dx] = tile;
-      moveToTile(player.getX() + dx, player.getY());
+      player.moveToTile(player.getX() + dx, player.getY());
     }
   }
 
@@ -498,12 +498,15 @@ class Player {
     return this.y;
   }
 
-  setX(x: number): void {
-    this.x = x;
+  moveToTile(newx: number, newy: number): void {
+    map[this.y][this.x] = new Air();
+    map[newy][newx] = new PlayerTile();
+    this.x = newx;
+    this.y = newy;
   }
 
-  setY(y: number): void {
-    this.y = y;
+  move(dx: number, dy: number): void {
+    this.moveToTile(this.x + dx, this.y + dy);
   }
 }
 
@@ -544,13 +547,6 @@ function remove(shouldRemove: RemoveStrategy) {
       }
     }
   }
-}
-
-function moveToTile(newx: number, newy: number) {
-  map[player.getY()][player.getX()] = new Air();
-  map[newy][newx] = new PlayerTile();
-  player.setX(newx);
-  player.setY(newy);
 }
 
 function update() {
