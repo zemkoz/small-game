@@ -501,11 +501,7 @@ class Player {
   }
 
   pushHorizontal(map: Map, tile: Tile, dx: number): void {
-    if (map.isAir(this.x + dx + dx, this.y)
-        && !map.isAir(this.x + dx, this.y + 1)) {
-      map.setTile(tile, this.x + dx + dx, this.y);
-      this.moveToTile(map, this.x + dx, this.y);
-    }
+    map.pushHorizontal(this, tile, this.x, this.y, dx);
   }
 
   draw(g: CanvasRenderingContext2D): void {
@@ -576,6 +572,14 @@ class Map {
 
   moveVertical(player: Player, x: number, y: number, dy: number): void {
     this.map[y + dy][x].moveVertical(map, player, dy);
+  }
+
+  pushHorizontal(player: Player, tile: Tile, x: number, y: number, dx: number) {
+    if (this.isAir(x + dx + dx, y)
+        && !this.isAir(x + dx, y + 1)) {
+      map.setTile(tile, x + dx + dx, y);
+      player.moveToTile(this, x + dx, y);
+    }
   }
 }
 
