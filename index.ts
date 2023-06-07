@@ -513,15 +513,7 @@ class Player {
 class Map {
   private map: Tile[][];
 
-  isAir(x: number, y: number): boolean {
-    return this.map[y][x].isAir();
-  }
-
-  setTile(tile: Tile, x: number, y: number): void {
-    this.map[y][x] = tile;
-  }
-
-  transform(rawMap: number[][]): void {
+  constructor(rawMap: number[][]) {
     this.map = new Array(rawMap.length);
     for (let y = 0; y < rawMap.length; y++) {
       this.map[y] = new Array(rawMap[y].length);
@@ -529,6 +521,14 @@ class Map {
         this.map[y][x] = transformTile(rawMap[y][x]);
       }
     }
+  }
+
+  isAir(x: number, y: number): boolean {
+    return this.map[y][x].isAir();
+  }
+
+  setTile(tile: Tile, x: number, y: number): void {
+    this.map[y][x] = tile;
   }
 
   draw(g: CanvasRenderingContext2D): void {
@@ -584,7 +584,6 @@ class Map {
 }
 
 const player = new Player();
-const map = new Map();
 
 let rawMap: RawTile[][] = [
   [2, 2, 2, 2, 2, 2, 2, 2],
@@ -594,6 +593,7 @@ let rawMap: RawTile[][] = [
   [2, 4, 1, 1, 1, 9, 0, 2],
   [2, 2, 2, 2, 2, 2, 2, 2],
 ];
+const map = new Map(rawMap);
 
 let inputs: Input[] = [];
 
@@ -613,7 +613,7 @@ class RemoveLock2 implements RemoveStrategy {
   }
 }
 
-function update() {
+function update(map: Map) {
   handleInputs();
   map.update();
 }
@@ -638,14 +638,14 @@ function createGraphics() {
   return g;
 }
 
-function gameLoop() {
+function gameLoop(map: Map) {
   let before = Date.now();
-  update();
+  update(map);
   draw();
   let after = Date.now();
   let frameTime = after - before;
   let sleep = SLEEP - frameTime;
-  setTimeout(() => gameLoop(), sleep);
+  setTimeout(() => gameLoop(map), sleep);
 }
 
 const YELLOW_KEY_CONF = new KeyConfiguration("#ffcc00", true, new RemoveLock1());
@@ -674,8 +674,7 @@ function assertExhausted(x: never): never {
 }
 
 window.onload = () => {
-  map.transform(rawMap);
-  gameLoop();
+  gameLoop(map);
 }
 
 const LEFT_KEY = "ArrowLeft";
